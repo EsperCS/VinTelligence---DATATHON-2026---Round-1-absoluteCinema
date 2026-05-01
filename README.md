@@ -1,90 +1,108 @@
-# README - Tái tạo `submission_sniper_3.csv`
+# README
 
-## 1. Mục đích
+Repository này hiện có hai phần chính:
 
-Repository này được nộp kèm để ban tổ chức có thể kiểm tra và tái tạo file
-submission cuối cùng:
+- `Task1`: notebook phân tích dữ liệu và trả lời câu hỏi trắc nghiệm.
+- `Task3`: pipeline tái tạo file dự báo `submission_sniper_3.csv`.
 
-```text
-data/submission_sniper_3.csv
-```
-
-Submission này là kết quả của một pipeline dự báo nhiều tầng, trong đó dự báo
-cuối được tạo bằng một bước ensemble bảo thủ trên hai tín hiệu trung gian:
-
-```text
-Revenue = 0.95 * current_best + 0.05 * stock_conservative
-COGS    = Revenue * 0.8900
-```
-
-Trong đó:
-
-- `current_best`: forecast anchor chính
-- `stock_conservative`: lớp hiệu chỉnh theo ràng buộc tồn kho
-
-Hai artifact trung gian trên **không cần được chuẩn bị thủ công**. Chúng được
-tạo tự động trong quy trình full reproduction từ raw data.
-
----
-
-## 2. Cấu trúc repository
+## Cấu trúc thư mục
 
 ```text
 .
 ├── README.md
-├── requirements.txt
-├── src/
-│   ├── reproduce_submission_sniper_3.py
-│   ├── train_final_sniper_grid.py
-│   ├── final_feature_prune_and_retrain.py
-│   ├── train_spike_aware_model.py
-│   ├── train_promo_regime_model.py
-│   ├── train_spike_probability_gate.py
-│   ├── adaptive_scaling_layer.py
-│   ├── train_meta_scaling.py
-│   ├── train_direct_seasonal_residual_model.py
-│   ├── final_micro_calibration.py
-│   └── train_stock_aware_scaling.py
-└── data/
-    ├── sales.csv
-    ├── orders.csv
-    ├── order_items.csv
-    ├── products.csv
-    ├── promotions.csv
-    ├── inventory.csv
-    ├── web_traffic.csv
-    ├── daily_feature_table.csv
-    ├── sample_submission.csv
-    └── future_promo_calendar_features.csv
+├── Task1
+│   ├── answers.ipynb
+│   ├── dap_an.txt
+│   └── dataset
+│       └── round1
+└── Task3
+    ├── requirements.txt
+    ├── data
+    └── src
 ```
 
----
+## Task1
 
-## 3. Yêu cầu môi trường
+`Task1/answers.ipynb` là notebook dùng để đọc dữ liệu trong `Task1/dataset/round1`, tính toán cho từng câu hỏi, và suy ra đáp án.
 
-### Python
+### Dữ liệu đầu vào
+
+Notebook đang được cấu hình để dùng dataset tại:
+
+```text
+Task1/dataset/round1
+```
+
+Trong đó có các file như:
+
+- `orders.csv`
+- `order_items.csv`
+- `products.csv`
+- `returns.csv`
+- `web_traffic.csv`
+- `customers.csv`
+- `geography.csv`
+- `payments.csv`
+- `sales.csv`
+
+### Cách chạy Task1
+
+1. Cài Python 3.10+.
+2. Cài các thư viện cần thiết:
+
+```bash
+pip install pandas jupyter
+```
+
+3. Mở Jupyter Notebook:
+
+```bash
+jupyter notebook
+```
+
+4. Mở file:
+
+```text
+Task1/answers.ipynb
+```
+
+5. Chạy lần lượt các cell trong notebook để sinh kết quả cho từng câu.
+
+### Kết quả Task1
+
+- File notebook: `Task1/answers.ipynb`
+- File đáp án chữ cái: `Task1/dap_an.txt`
+
+## Task3
+
+`Task3` chứa pipeline để tái tạo submission cuối cùng:
+
+```text
+Task3/data/submission_sniper_3.csv
+```
+
+### Môi trường
 
 - Python `3.10+`
 
-### Cài đặt thư viện
+### Cài thư viện
 
-Sử dụng:
+Di chuyển vào thư mục `Task3` rồi cài dependency:
 
 ```bash
+cd Task3
 pip install -r requirements.txt
 ```
 
-hoặc cài trực tiếp:
+### Dữ liệu đầu vào
 
-```bash
-pip install numpy pandas scikit-learn lightgbm
+Các file đầu vào của `Task3` nằm trong:
+
+```text
+Task3/data
 ```
 
----
-
-## 4. Dữ liệu đầu vào
-
-Các file đầu vào cần được đặt trong thư mục `data/`:
+Ví dụ:
 
 - `sales.csv`
 - `orders.csv`
@@ -95,121 +113,41 @@ Các file đầu vào cần được đặt trong thư mục `data/`:
 - `web_traffic.csv`
 - `daily_feature_table.csv`
 - `sample_submission.csv`
-- `future_promo_calendar_features.csv` (nếu được cung cấp trong bộ dữ liệu cuộc thi)
+- `future_promo_calendar_features.csv`
 
----
+### Chạy pipeline Task3
 
-## 5. Lệnh tái tạo chính
-
-Lệnh chính để tái tạo submission cuối cùng:
+Từ thư mục `Task3`, chạy:
 
 ```bash
 python src/reproduce_submission_sniper_3.py --mode full
 ```
 
-Đầu ra cuối cùng:
+Kết quả cuối cùng:
 
 ```text
-data/submission_sniper_3.csv
+Task3/data/submission_sniper_3.csv
 ```
 
-Nếu workspace đã tồn tại các output generated từ lần chạy trước, có thể sử dụng:
+Nếu muốn chỉ dựng output cuối từ các artifact đã có sẵn:
+
+```bash
+python src/reproduce_submission_sniper_3.py --mode fast
+```
+
+Nếu muốn cho phép ghi đè các file đã sinh:
 
 ```bash
 python src/reproduce_submission_sniper_3.py --mode full --force
 ```
 
-để ghi đè các output được tạo trong quá trình reproduce.
+### Ghi chú về Task3
 
----
+- Entry-point chính: `Task3/src/reproduce_submission_sniper_3.py`
+- Script này kiểm tra schema đầu ra gồm các cột: `Date`, `Revenue`, `COGS`
+- Pipeline có thể chạy ở `fast` hoặc `full`
 
-## 6. Giải thích pipeline
+## Gợi ý sử dụng nhanh
 
-Script entry-point:
-
-```text
-src/reproduce_submission_sniper_3.py
-```
-
-Script này điều phối toàn bộ pipeline và tái tạo submission cuối từ raw data.
-
-Trình tự các bước chính:
-
-1. Huấn luyện và sinh `submission_pruned_ensemble.csv`
-2. Huấn luyện và sinh `submission_spike_aware.csv`
-3. Huấn luyện và sinh `submission_promo_regime.csv`
-4. Tạo `submission_regime_ultra_15.csv`
-5. Huấn luyện spike probability gate
-6. Chạy adaptive scaling layer
-7. Chạy meta scaling
-8. Huấn luyện direct seasonal residual model
-9. Chạy final micro calibration
-10. Dựng `submission_cogs_ratio_8900.csv`
-11. Dựng `submission_blend_direct_15_cogs8900.csv`
-12. Huấn luyện stock-aware scaling
-13. Sinh `submission_sniper_3.csv`
-
-Giải thích:
-
-- `submission_blend_direct_15_cogs8900.csv` là forecast anchor chính của nhánh cuối
-- `submission_stock_scale_conservative.csv` là nhánh hiệu chỉnh bảo thủ theo tín hiệu tồn kho
-- `submission_sniper_3.csv` là ensemble rất nhỏ giữa hai nhánh trên
-
-Do đó, việc công thức cuối tham chiếu tới các artifact trung gian là một phần tự
-nhiên của pipeline. Các artifact này được sinh ra trong quá trình chạy full
-reproduction, không phải đầu vào thủ công.
-
----
-
-## 7. Kiểm tra đầu ra
-
-Trong quá trình tái tạo, script kiểm tra các điều kiện sau cho submission cuối:
-
-- số dòng khớp với `sample_submission.csv`
-- đúng thứ tự `Date`
-- đúng schema:
-
-```text
-Date, Revenue, COGS
-```
-
-- không có missing values
-- không có giá trị âm
-
----
-
-## 8. File submission cuối cùng
-
-File dùng để nộp leaderboard:
-
-```text
-data/submission_sniper_3.csv
-```
-
----
-
-## 9. Ghi chú cho ban tổ chức
-
-Repository này được tổ chức theo hướng:
-
-- full reproducibility từ raw data
-- có `requirements.txt` để cài đặt môi trường
-- có `README.md` mô tả cấu trúc thư mục, dữ liệu đầu vào và cách chạy lại
-- có script entry-point rõ ràng:
-
-```bash
-python src/reproduce_submission_sniper_3.py --mode full
-```
-
-Nếu cần kiểm tra nhanh công thức cuối cùng, có thể xem thêm:
-
-```text
-src/train_final_sniper_grid.py
-```
-
-Script này mô tả trực tiếp các cấu hình sniper-grid và ứng viên
-`submission_sniper_3.csv` tương ứng với công thức:
-
-```text
-Revenue = (0.950 * current_best + 0.050 * stock_conservative) * 1.0000
-```
+- Nếu bạn cần xem và chạy phần trả lời câu hỏi dữ liệu: vào `Task1/answers.ipynb`
+- Nếu bạn cần tái tạo submission dự báo: vào `Task3` và chạy `src/reproduce_submission_sniper_3.py`
